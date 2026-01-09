@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,8 @@ type Post = {
 };
 
 const Index = () => {
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [activeTab, setActiveTab] = useState('piggy');
   const [addAmount, setAddAmount] = useState('');
   const [removeAmount, setRemoveAmount] = useState('');
@@ -73,27 +75,33 @@ const Index = () => {
   const [profileCity, setProfileCity] = useState('Москва');
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   
-  const [goals, setGoals] = useState<Goal[]>([
-    { id: '1', title: 'Новый велосипед', current: 15000, target: 50000, image: '🚴' },
-    { id: '2', title: 'Отпуск на море', current: 30000, target: 100000, image: '🏖️' },
-  ]);
+  const defaultGoals: Goal[] = [
+    { id: 'demo-1', title: 'Новый велосипед', current: 15000, target: 50000, image: '🚴' },
+    { id: 'demo-2', title: 'Отпуск на море', current: 30000, target: 100000, image: '🏖️' },
+  ];
   
-  const [habits, setHabits] = useState<Habit[]>([
-    { id: '1', title: 'Откладывать 10$ в неделю', type: 'financial', streak: 5, completed: true },
-    { id: '2', title: 'Заниматься спортом', type: 'general', streak: 12, completed: false },
-    { id: '3', title: 'Читать 30 минут', type: 'general', streak: 8, completed: true },
-  ]);
+  const [goals, setGoals] = useState<Goal[]>(defaultGoals);
+  
+  const defaultHabits: Habit[] = [
+    { id: 'demo-1', title: 'Откладывать 10$ в неделю', type: 'financial', streak: 5, completed: true },
+    { id: 'demo-2', title: 'Заниматься спортом', type: 'general', streak: 12, completed: false },
+    { id: 'demo-3', title: 'Читать 30 минут', type: 'general', streak: 8, completed: true },
+  ];
+  
+  const [habits, setHabits] = useState<Habit[]>(defaultHabits);
 
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', title: 'Внести данные в копилку', period: 'today', completed: false },
-    { id: '2', title: 'Накопить 20,000₽', period: 'week', completed: false },
-    { id: '3', title: 'Купить велосипед', period: 'month', completed: false },
-    { id: '4', title: 'Съездить в отпуск', period: 'year', completed: false },
-  ]);
+  const defaultTasks: Task[] = [
+    { id: 'demo-1', title: 'Внести данные в копилку', period: 'today', completed: false },
+    { id: 'demo-2', title: 'Накопить 20,000₽', period: 'week', completed: false },
+    { id: 'demo-3', title: 'Купить велосипед', period: 'month', completed: false },
+    { id: 'demo-4', title: 'Съездить в отпуск', period: 'year', completed: false },
+  ];
+  
+  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
 
-  const [posts, setPosts] = useState<Post[]>([
+  const defaultPosts: Post[] = [
     {
-      id: '1',
+      id: 'demo-1',
       author: 'Мария',
       avatar: '👩',
       text: 'Достигла цели! Купила новый велосипед! 🚴 #мечтасбылась',
@@ -103,7 +111,7 @@ const Index = () => {
       liked: false,
     },
     {
-      id: '2',
+      id: 'demo-2',
       author: 'Алексей',
       avatar: '👨',
       text: 'Неделя без импульсивных покупок пройдена! 💪 #финансоваясвобода',
@@ -112,9 +120,78 @@ const Index = () => {
       badges: 15,
       liked: false,
     },
-  ]);
+  ];
+  
+  const [posts, setPosts] = useState<Post[]>(defaultPosts);
 
   const quote = "Каждый день — это новая возможность стать лучше! ✨";
+
+  useEffect(() => {
+    const visited = localStorage.getItem('myday_visited');
+    if (!visited) {
+      setIsFirstVisit(true);
+      localStorage.setItem('myday_visited', 'true');
+    }
+
+    const savedGoals = localStorage.getItem('myday_goals');
+    const savedHabits = localStorage.getItem('myday_habits');
+    const savedTasks = localStorage.getItem('myday_tasks');
+    const savedPosts = localStorage.getItem('myday_posts');
+    const savedProfile = localStorage.getItem('myday_profile');
+
+    if (savedGoals) setGoals(JSON.parse(savedGoals));
+    if (savedHabits) setHabits(JSON.parse(savedHabits));
+    if (savedTasks) setTasks(JSON.parse(savedTasks));
+    if (savedPosts) setPosts(JSON.parse(savedPosts));
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      setProfileName(profile.name);
+      setProfileCity(profile.city);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('myday_goals', JSON.stringify(goals));
+  }, [goals]);
+
+  useEffect(() => {
+    localStorage.setItem('myday_habits', JSON.stringify(habits));
+  }, [habits]);
+
+  useEffect(() => {
+    localStorage.setItem('myday_tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('myday_posts', JSON.stringify(posts));
+  }, [posts]);
+
+  useEffect(() => {
+    localStorage.setItem('myday_profile', JSON.stringify({ name: profileName, city: profileCity }));
+  }, [profileName, profileCity]);
+
+  const clearAllData = () => {
+    setGoals([]);
+    setHabits([]);
+    setTasks([]);
+    setPosts([]);
+    setProfileName('Ваше имя');
+    setProfileCity('Москва');
+    localStorage.removeItem('myday_goals');
+    localStorage.removeItem('myday_habits');
+    localStorage.removeItem('myday_tasks');
+    localStorage.removeItem('myday_posts');
+    localStorage.removeItem('myday_profile');
+  };
+
+  const startFresh = () => {
+    clearAllData();
+    setIsFirstVisit(false);
+  };
+
+  const continueWithDemo = () => {
+    setIsFirstVisit(false);
+  };
 
   const addMoney = (goalId: string, amount: number) => {
     setGoals(goals.map(g => 
@@ -234,6 +311,163 @@ const Index = () => {
     ));
   };
 
+  if (isFirstVisit) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-8 bg-gradient-to-br from-card to-primary/10 border-primary/30 rounded-3xl animate-scale-in">
+          <div className="text-center space-y-6">
+            <div className="text-6xl mb-4 animate-bounce-soft">🎉</div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Добро пожаловать в MyDay!
+            </h1>
+            <p className="text-muted-foreground">
+              Ваш личный ежедневник для достижения целей и отслеживания привычек
+            </p>
+            
+            <div className="space-y-3 text-left bg-background/50 p-4 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Icon name="PiggyBank" size={20} className="text-primary" />
+                </div>
+                <p className="text-sm">Копилка для ваших мечт</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                  <Icon name="Target" size={20} className="text-accent" />
+                </div>
+                <p className="text-sm">Трекер привычек и целей</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Icon name="Users" size={20} className="text-primary" />
+                </div>
+                <p className="text-sm">Социальная лента достижений</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-4">
+              <Button 
+                className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent h-12 text-base"
+                onClick={startFresh}
+              >
+                Начать с чистого листа
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full rounded-2xl h-12 text-base"
+                onClick={continueWithDemo}
+              >
+                Посмотреть пример
+              </Button>
+            </div>
+
+            <Button 
+              variant="ghost" 
+              className="text-sm text-muted-foreground"
+              onClick={() => setShowInstallGuide(true)}
+            >
+              <Icon name="Download" size={16} className="mr-2" />
+              Как установить на главный экран?
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (showInstallGuide) {
+    return (
+      <div className="min-h-screen bg-background p-4">
+        <div className="max-w-md mx-auto">
+          <Button 
+            variant="ghost" 
+            className="mb-4"
+            onClick={() => setShowInstallGuide(false)}
+          >
+            <Icon name="ArrowLeft" size={20} className="mr-2" />
+            Назад
+          </Button>
+          
+          <Card className="p-6 bg-card border-border rounded-3xl space-y-6">
+            <div className="text-center">
+              <div className="text-5xl mb-4">📱</div>
+              <h2 className="text-2xl font-bold mb-2">Установка на главный экран</h2>
+              <p className="text-muted-foreground">
+                Используйте MyDay как обычное приложение!
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+                  <Icon name="Smartphone" size={20} className="text-primary" />
+                  Для iPhone (Safari)
+                </h3>
+                <ol className="space-y-3 text-sm text-muted-foreground">
+                  <li className="flex gap-3">
+                    <span className="font-bold text-primary">1.</span>
+                    <span>Откройте этот сайт в <strong>Safari</strong></span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-bold text-primary">2.</span>
+                    <span>Нажмите на кнопку "Поделиться" <Icon name="Share" size={14} className="inline" /> внизу экрана</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-bold text-primary">3.</span>
+                    <span>Прокрутите вниз и выберите <strong>"На экран Домой"</strong></span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-bold text-primary">4.</span>
+                    <span>Нажмите <strong>"Добавить"</strong></span>
+                  </li>
+                </ol>
+              </div>
+
+              <div className="border-t border-border pt-6">
+                <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+                  <Icon name="Smartphone" size={20} className="text-accent" />
+                  Для Android (Chrome)
+                </h3>
+                <ol className="space-y-3 text-sm text-muted-foreground">
+                  <li className="flex gap-3">
+                    <span className="font-bold text-accent">1.</span>
+                    <span>Откройте этот сайт в <strong>Chrome</strong></span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-bold text-accent">2.</span>
+                    <span>Нажмите на меню <Icon name="MoreVertical" size={14} className="inline" /> (три точки)</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-bold text-accent">3.</span>
+                    <span>Выберите <strong>"Добавить на главный экран"</strong></span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-bold text-accent">4.</span>
+                    <span>Нажмите <strong>"Добавить"</strong></span>
+                  </li>
+                </ol>
+              </div>
+            </div>
+
+            <div className="bg-primary/10 p-4 rounded-2xl">
+              <p className="text-sm text-center">
+                <Icon name="Sparkles" size={16} className="inline mr-2" />
+                После установки приложение будет работать как обычное, даже без интернета!
+              </p>
+            </div>
+
+            <Button 
+              className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent"
+              onClick={() => setShowInstallGuide(false)}
+            >
+              Понятно, спасибо!
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="max-w-md mx-auto">
@@ -243,9 +477,16 @@ const Index = () => {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               MyDay
             </h1>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Icon name="Bell" size={24} />
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full"
+                onClick={() => setShowInstallGuide(true)}
+              >
+                <Icon name="Download" size={24} />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -742,6 +983,59 @@ const Index = () => {
                     {emoji}
                   </div>
                 ))}
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-card border-border rounded-2xl">
+              <h3 className="font-bold mb-3 flex items-center gap-2">
+                <Icon name="Settings" size={20} className="text-muted-foreground" />
+                Настройки
+              </h3>
+              <div className="space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full rounded-2xl justify-start"
+                  onClick={() => setShowInstallGuide(true)}
+                >
+                  <Icon name="Download" size={18} className="mr-2" />
+                  Установить приложение
+                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full rounded-2xl justify-start text-destructive hover:text-destructive"
+                    >
+                      <Icon name="Trash2" size={18} className="mr-2" />
+                      Очистить все данные
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="rounded-3xl">
+                    <DialogHeader>
+                      <DialogTitle>Очистить все данные?</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <p className="text-muted-foreground">
+                        Это действие удалит все ваши цели, привычки, задачи и посты. Вы уверены?
+                      </p>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          className="flex-1 rounded-2xl"
+                        >
+                          Отмена
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          className="flex-1 rounded-2xl"
+                          onClick={clearAllData}
+                        >
+                          Удалить
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </Card>
           </TabsContent>
