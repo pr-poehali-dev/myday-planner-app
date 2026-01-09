@@ -48,6 +48,11 @@ type Post = {
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('piggy');
+  const [addAmount, setAddAmount] = useState('');
+  const [removeAmount, setRemoveAmount] = useState('');
+  const [addDialogOpen, setAddDialogOpen] = useState<string | null>(null);
+  const [removeDialogOpen, setRemoveDialogOpen] = useState<string | null>(null);
+  
   const [goals, setGoals] = useState<Goal[]>([
     { id: '1', title: 'Новый велосипед', current: 15000, target: 50000, image: '🚴' },
     { id: '2', title: 'Отпуск на море', current: 30000, target: 100000, image: '🏖️' },
@@ -90,6 +95,36 @@ const Index = () => {
   ]);
 
   const quote = "Каждый день — это новая возможность стать лучше! ✨";
+
+  const addMoney = (goalId: string, amount: number) => {
+    setGoals(goals.map(g => 
+      g.id === goalId ? { ...g, current: Math.min(g.current + amount, g.target) } : g
+    ));
+  };
+
+  const removeMoney = (goalId: string, amount: number) => {
+    setGoals(goals.map(g => 
+      g.id === goalId ? { ...g, current: Math.max(g.current - amount, 0) } : g
+    ));
+  };
+
+  const handleAddMoney = (goalId: string) => {
+    const amount = parseFloat(addAmount);
+    if (!isNaN(amount) && amount > 0) {
+      addMoney(goalId, amount);
+      setAddAmount('');
+      setAddDialogOpen(null);
+    }
+  };
+
+  const handleRemoveMoney = (goalId: string) => {
+    const amount = parseFloat(removeAmount);
+    if (!isNaN(amount) && amount > 0) {
+      removeMoney(goalId, amount);
+      setRemoveAmount('');
+      setRemoveDialogOpen(null);
+    }
+  };
 
   const toggleHabit = (id: string) => {
     setHabits(habits.map(h => 
@@ -195,14 +230,63 @@ const Index = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 rounded-2xl bg-gradient-to-r from-primary to-accent">
-                    <Icon name="Plus" size={16} className="mr-2" />
-                    Добавить
-                  </Button>
-                  <Button variant="outline" className="flex-1 rounded-2xl">
-                    <Icon name="Minus" size={16} className="mr-2" />
-                    Снять
-                  </Button>
+                  <Dialog open={addDialogOpen === goal.id} onOpenChange={(open) => setAddDialogOpen(open ? goal.id : null)}>
+                    <DialogTrigger asChild>
+                      <Button className="flex-1 rounded-2xl bg-gradient-to-r from-primary to-accent">
+                        <Icon name="Plus" size={16} className="mr-2" />
+                        Добавить
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="rounded-3xl">
+                      <DialogHeader>
+                        <DialogTitle>Добавить деньги</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <Input 
+                          type="number" 
+                          placeholder="Сумма" 
+                          className="rounded-2xl" 
+                          value={addAmount}
+                          onChange={(e) => setAddAmount(e.target.value)}
+                        />
+                        <Button 
+                          className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent"
+                          onClick={() => handleAddMoney(goal.id)}
+                        >
+                          Добавить
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={removeDialogOpen === goal.id} onOpenChange={(open) => setRemoveDialogOpen(open ? goal.id : null)}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="flex-1 rounded-2xl">
+                        <Icon name="Minus" size={16} className="mr-2" />
+                        Снять
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="rounded-3xl">
+                      <DialogHeader>
+                        <DialogTitle>Снять деньги</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <Input 
+                          type="number" 
+                          placeholder="Сумма" 
+                          className="rounded-2xl" 
+                          value={removeAmount}
+                          onChange={(e) => setRemoveAmount(e.target.value)}
+                        />
+                        <Button 
+                          className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent"
+                          onClick={() => handleRemoveMoney(goal.id)}
+                        >
+                          Снять
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </Card>
             ))}
