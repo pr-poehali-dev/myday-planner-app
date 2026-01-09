@@ -280,7 +280,7 @@ const Index = () => {
           <TabsContent value="piggy" className="space-y-4 animate-fade-in">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Копилка</h2>
-              <Dialog>
+              <Dialog open={goalDialogOpen} onOpenChange={setGoalDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="rounded-full bg-gradient-to-r from-primary to-accent">
                     <Icon name="Plus" size={20} className="mr-2" />
@@ -292,10 +292,29 @@ const Index = () => {
                     <DialogTitle>Новая цель</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <Input placeholder="Название цели" className="rounded-2xl" />
-                    <Input type="number" placeholder="Целевая сумма" className="rounded-2xl" />
-                    <Input placeholder="Эмодзи мечты (🚴, 🏖️, 🎮)" className="rounded-2xl" />
-                    <Button className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent">
+                    <Input 
+                      placeholder="Название цели" 
+                      className="rounded-2xl" 
+                      value={newGoalTitle}
+                      onChange={(e) => setNewGoalTitle(e.target.value)}
+                    />
+                    <Input 
+                      type="number" 
+                      placeholder="Целевая сумма" 
+                      className="rounded-2xl" 
+                      value={newGoalTarget}
+                      onChange={(e) => setNewGoalTarget(e.target.value)}
+                    />
+                    <Input 
+                      placeholder="Эмодзи мечты (🚴, 🏖️, 🎮)" 
+                      className="rounded-2xl" 
+                      value={newGoalEmoji}
+                      onChange={(e) => setNewGoalEmoji(e.target.value)}
+                    />
+                    <Button 
+                      className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent"
+                      onClick={createGoal}
+                    >
                       Создать цель
                     </Button>
                   </div>
@@ -386,7 +405,7 @@ const Index = () => {
           <TabsContent value="habits" className="space-y-4 animate-fade-in">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Привычки</h2>
-              <Dialog>
+              <Dialog open={habitDialogOpen} onOpenChange={setHabitDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="rounded-full bg-gradient-to-r from-primary to-accent">
                     <Icon name="Plus" size={20} className="mr-2" />
@@ -398,16 +417,32 @@ const Index = () => {
                     <DialogTitle>Новая привычка</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <Input placeholder="Название привычки" className="rounded-2xl" />
+                    <Input 
+                      placeholder="Название привычки" 
+                      className="rounded-2xl" 
+                      value={newHabitTitle}
+                      onChange={(e) => setNewHabitTitle(e.target.value)}
+                    />
                     <div className="flex gap-2">
-                      <Button variant="outline" className="flex-1 rounded-2xl">
+                      <Button 
+                        variant={newHabitType === 'financial' ? 'default' : 'outline'} 
+                        className="flex-1 rounded-2xl"
+                        onClick={() => setNewHabitType('financial')}
+                      >
                         💰 Финансовая
                       </Button>
-                      <Button variant="outline" className="flex-1 rounded-2xl">
+                      <Button 
+                        variant={newHabitType === 'general' ? 'default' : 'outline'} 
+                        className="flex-1 rounded-2xl"
+                        onClick={() => setNewHabitType('general')}
+                      >
                         ⭐ Общая
                       </Button>
                     </div>
-                    <Button className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent">
+                    <Button 
+                      className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent"
+                      onClick={createHabit}
+                    >
                       Создать привычку
                     </Button>
                   </div>
@@ -450,7 +485,7 @@ const Index = () => {
           <TabsContent value="goals" className="space-y-4 animate-fade-in">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Цели</h2>
-              <Dialog>
+              <Dialog open={taskDialogOpen} onOpenChange={setTaskDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="rounded-full bg-gradient-to-r from-primary to-accent">
                     <Icon name="Plus" size={20} className="mr-2" />
@@ -462,14 +497,46 @@ const Index = () => {
                     <DialogTitle>Новая цель</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <Input placeholder="Название цели" className="rounded-2xl" />
+                    <Input 
+                      placeholder="Название цели" 
+                      className="rounded-2xl" 
+                      value={newTaskTitle}
+                      onChange={(e) => setNewTaskTitle(e.target.value)}
+                    />
                     <div className="grid grid-cols-2 gap-2">
-                      <Button variant="outline" className="rounded-2xl">Сегодня</Button>
-                      <Button variant="outline" className="rounded-2xl">Неделя</Button>
-                      <Button variant="outline" className="rounded-2xl">Месяц</Button>
-                      <Button variant="outline" className="rounded-2xl">Год</Button>
+                      <Button 
+                        variant={newTaskPeriod === 'today' ? 'default' : 'outline'} 
+                        className="rounded-2xl"
+                        onClick={() => setNewTaskPeriod('today')}
+                      >
+                        Сегодня
+                      </Button>
+                      <Button 
+                        variant={newTaskPeriod === 'week' ? 'default' : 'outline'} 
+                        className="rounded-2xl"
+                        onClick={() => setNewTaskPeriod('week')}
+                      >
+                        Неделя
+                      </Button>
+                      <Button 
+                        variant={newTaskPeriod === 'month' ? 'default' : 'outline'} 
+                        className="rounded-2xl"
+                        onClick={() => setNewTaskPeriod('month')}
+                      >
+                        Месяц
+                      </Button>
+                      <Button 
+                        variant={newTaskPeriod === 'year' ? 'default' : 'outline'} 
+                        className="rounded-2xl"
+                        onClick={() => setNewTaskPeriod('year')}
+                      >
+                        Год
+                      </Button>
                     </div>
-                    <Button className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent">
+                    <Button 
+                      className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent"
+                      onClick={createTask}
+                    >
                       Создать цель
                     </Button>
                   </div>
@@ -518,7 +585,7 @@ const Index = () => {
           <TabsContent value="feed" className="space-y-4 animate-fade-in">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Лента</h2>
-              <Dialog>
+              <Dialog open={postDialogOpen} onOpenChange={setPostDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="rounded-full bg-gradient-to-r from-primary to-accent">
                     <Icon name="Plus" size={20} className="mr-2" />
@@ -530,12 +597,20 @@ const Index = () => {
                     <DialogTitle>Новый пост</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <Textarea placeholder="Поделитесь достижением..." className="rounded-2xl min-h-[120px]" />
+                    <Textarea 
+                      placeholder="Поделитесь достижением..." 
+                      className="rounded-2xl min-h-[120px]" 
+                      value={newPostText}
+                      onChange={(e) => setNewPostText(e.target.value)}
+                    />
                     <Button variant="outline" className="w-full rounded-2xl">
                       <Icon name="Image" size={20} className="mr-2" />
                       Добавить фото
                     </Button>
-                    <Button className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent">
+                    <Button 
+                      className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent"
+                      onClick={createPost}
+                    >
                       Опубликовать
                     </Button>
                   </div>
@@ -589,8 +664,8 @@ const Index = () => {
                 <Avatar className="w-24 h-24 mb-4 bg-gradient-to-br from-primary to-accent text-5xl flex items-center justify-center">
                   👤
                 </Avatar>
-                <h2 className="text-2xl font-bold mb-1">Ваше имя</h2>
-                <p className="text-muted-foreground mb-4">Москва</p>
+                <h2 className="text-2xl font-bold mb-1">{profileName}</h2>
+                <p className="text-muted-foreground mb-4">{profileCity}</p>
                 <div className="flex gap-6 mb-6">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-primary">156</p>
@@ -605,9 +680,38 @@ const Index = () => {
                     <p className="text-xs text-muted-foreground">Подписчики</p>
                   </div>
                 </div>
-                <Button className="rounded-full bg-gradient-to-r from-primary to-accent w-full">
-                  Редактировать профиль
-                </Button>
+                <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="rounded-full bg-gradient-to-r from-primary to-accent w-full">
+                      Редактировать профиль
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="rounded-3xl">
+                    <DialogHeader>
+                      <DialogTitle>Редактировать профиль</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <Input 
+                        placeholder="Ваше имя" 
+                        className="rounded-2xl" 
+                        value={profileName}
+                        onChange={(e) => setProfileName(e.target.value)}
+                      />
+                      <Input 
+                        placeholder="Город" 
+                        className="rounded-2xl" 
+                        value={profileCity}
+                        onChange={(e) => setProfileCity(e.target.value)}
+                      />
+                      <Button 
+                        className="w-full rounded-2xl bg-gradient-to-r from-primary to-accent"
+                        onClick={updateProfile}
+                      >
+                        Сохранить
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </Card>
 
