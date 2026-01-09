@@ -53,6 +53,26 @@ const Index = () => {
   const [addDialogOpen, setAddDialogOpen] = useState<string | null>(null);
   const [removeDialogOpen, setRemoveDialogOpen] = useState<string | null>(null);
   
+  const [newGoalTitle, setNewGoalTitle] = useState('');
+  const [newGoalTarget, setNewGoalTarget] = useState('');
+  const [newGoalEmoji, setNewGoalEmoji] = useState('');
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  
+  const [newHabitTitle, setNewHabitTitle] = useState('');
+  const [newHabitType, setNewHabitType] = useState<'financial' | 'general'>('general');
+  const [habitDialogOpen, setHabitDialogOpen] = useState(false);
+  
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskPeriod, setNewTaskPeriod] = useState<'today' | 'week' | 'month' | 'year'>('today');
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  
+  const [newPostText, setNewPostText] = useState('');
+  const [postDialogOpen, setPostDialogOpen] = useState(false);
+  
+  const [profileName, setProfileName] = useState('Ваше имя');
+  const [profileCity, setProfileCity] = useState('Москва');
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  
   const [goals, setGoals] = useState<Goal[]>([
     { id: '1', title: 'Новый велосипед', current: 15000, target: 50000, image: '🚴' },
     { id: '2', title: 'Отпуск на море', current: 30000, target: 100000, image: '🏖️' },
@@ -124,6 +144,76 @@ const Index = () => {
       setRemoveAmount('');
       setRemoveDialogOpen(null);
     }
+  };
+
+  const createGoal = () => {
+    if (newGoalTitle && newGoalTarget) {
+      const newGoal: Goal = {
+        id: Date.now().toString(),
+        title: newGoalTitle,
+        image: newGoalEmoji || '🎯',
+        current: 0,
+        target: parseFloat(newGoalTarget)
+      };
+      setGoals([...goals, newGoal]);
+      setNewGoalTitle('');
+      setNewGoalTarget('');
+      setNewGoalEmoji('');
+      setGoalDialogOpen(false);
+    }
+  };
+
+  const createHabit = () => {
+    if (newHabitTitle) {
+      const newHabit: Habit = {
+        id: Date.now().toString(),
+        title: newHabitTitle,
+        type: newHabitType,
+        streak: 0,
+        completed: false
+      };
+      setHabits([...habits, newHabit]);
+      setNewHabitTitle('');
+      setNewHabitType('general');
+      setHabitDialogOpen(false);
+    }
+  };
+
+  const createTask = () => {
+    if (newTaskTitle) {
+      const newTask: Task = {
+        id: Date.now().toString(),
+        title: newTaskTitle,
+        period: newTaskPeriod,
+        completed: false
+      };
+      setTasks([...tasks, newTask]);
+      setNewTaskTitle('');
+      setNewTaskPeriod('today');
+      setTaskDialogOpen(false);
+    }
+  };
+
+  const createPost = () => {
+    if (newPostText) {
+      const newPost: Post = {
+        id: Date.now().toString(),
+        author: profileName,
+        avatar: '👤',
+        text: newPostText,
+        likes: 0,
+        comments: 0,
+        badges: 0,
+        liked: false
+      };
+      setPosts([newPost, ...posts]);
+      setNewPostText('');
+      setPostDialogOpen(false);
+    }
+  };
+
+  const updateProfile = () => {
+    setProfileDialogOpen(false);
   };
 
   const toggleHabit = (id: string) => {
